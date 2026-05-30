@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ey_demo
+      POSTGRES_USER: ey_user
+      POSTGRES_PASSWORD: ey_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.2
+    container_name: keycloak
+    command:
+      - start-dev
+      - --import-realm
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+
+  postgres-mcp:
+    image: openmcpserver/mcp-postgres
+    restart: unless-stopped
+    container_name: postgres-mcp
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8080"
+    environment:
+      DATABASE_URL: postgres://ey_user:ey_password@postgres:5432/ey_demo
+      POSTGRES_READ_ONLY: "true"
+
+volumes:
+  postgres_data:

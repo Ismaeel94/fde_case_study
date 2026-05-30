@@ -1,32 +1,30 @@
-from typing import Annotated
-
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from fastapi import Depends
+from app.services.assistant import AssistantUnauthorizedError
+from app.schemas.assistant import AssistantResponse
 
-from app.api.v1.endpoints.auth import SESSION_STORE
-from app.schemas.assistant import AssistantRequest, AssistantResponse
+from app.api.deps import get_assistant_service
+from app.services.assistant import AssistantService
 
 router = APIRouter(tags=["assistant"])
 
 
-@router.get("/assistant")
-def assistant(
+@router.get("/messages")
+def messages(
     http_request: Request,
-    message: str | None = "Default message",
+    message: str | None = None,
+    assistant_service: AssistantService = Depends(get_assistant_service),
 ) -> AssistantResponse:
-    session_id = http_request.cookies.get("session")
-    if not session_id or session_id not in SESSION_STORE:
+    try:
+        return assistant_service.get_response(
+            message,
+            http_request.cookies.get("session"),
+        )
+    except AssistantUnauthorizedError:
         raise HTTPException(status_code=401, detail="Unauthorized")
-
-    session = SESSION_STORE[session_id]
-    name = session.get("username") or assistant_request.message or "guest"
-    return AssistantResponse(message=f"Hello, {name}! I am the assistant.")
 
 
 @router.get("/")
 def home():
     return RedirectResponse(url="/assistant")
-
-
-
-

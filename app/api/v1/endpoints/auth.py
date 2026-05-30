@@ -7,11 +7,10 @@ from fastapi.responses import RedirectResponse
 from jose import JWTError, jwt
 
 from app.core.config import settings
+from app.core.session import SESSION_STORE
 from app.schemas.assistant import AssistantRequest
 
 router = APIRouter(tags=["auth"])
-
-SESSION_STORE: dict[str, dict] = {}
 
 
 @router.get("/login")
@@ -28,6 +27,8 @@ def login():
 
 @router.get("/auth/callback")
 async def auth_callback(code: str):
+
+    print(f"Callback endpoint called")
     token_url = (
         f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.REALM}/protocol/openid-connect/token"
     )
@@ -69,8 +70,8 @@ async def auth_callback(code: str):
 
     SESSION_STORE[session_id] = session
 
-    assistant_params = urlencode({"message": "Just logged in!"})
-    response = RedirectResponse(f"/assistant?{assistant_params}")
+    
+    response = RedirectResponse(f"/assistant")
     response.set_cookie(
         key="session",
         value=session_id,

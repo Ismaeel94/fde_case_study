@@ -1,0 +1,73 @@
+{
+  "realm" : "case_study",
+  "users" : [ {
+    "id" : "c7425bc8-85d9-47f1-b9f1-928af716347a",
+    "username" : "admin_user",
+    "firstName" : "Admin",
+    "lastName" : "User",
+    "email" : "admin@example.com",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1779980770516,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "31ec3f2c-4366-42f4-98a1-e67994966200",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1779980838734,
+      "secretData" : "{\"value\":\"gCJ3s0pewqj0EEOZlj67gkFF4+zl5x2oR5GC8VlLIKQ=\",\"salt\":\"TB/+d8ynD4aQGnWhnDoAPQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "admin", "default-roles-case_study" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "ffbcb6f1-2506-4888-b255-8c56a64c14e4",
+    "username" : "sales_user",
+    "firstName" : "Sales",
+    "lastName" : "User",
+    "email" : "sales@example.com",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1779980792454,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "60c93560-1ea8-4f5a-827e-6b65dd01106b",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1779980821669,
+      "secretData" : "{\"value\":\"TdrjVl3jZTVWn4J+ficANBxQXWeCIW7jri89NUFupKE=\",\"salt\":\"I2wLrbbkknUc9B3Q0Ef2qA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-case_study" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "0bc54f52-89e0-467c-aa8d-aba341e4c308",
+    "username" : "support_user",
+    "firstName" : "Support",
+    "lastName" : "User",
+    "email" : "support@example.com",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1779980872426,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "65d425de-266f-41e9-87b9-e62ea5e50f52",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1779980906732,
+      "secretData" : "{\"value\":\"w/AFe8vdqFrhCMBXmUwo68ayozyaRSEGV+n3oBTOttY=\",\"salt\":\"QMxELN84jrfiNnUxb8Rhtw==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-case_study" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

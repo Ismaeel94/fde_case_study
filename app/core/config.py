@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     KEY_CLOAK_LOGIN_URL: str = "http://localhost:8080/realms/{REALM}/protocol/openid-connect/auth?client_id={CLIENT_ID}&response_type=code&scope=openid&redirect_uri={REDIRECT_URI}"
     KEY_CLOAK_REDIRECT_URI: str = "http://localhost:8000/auth/callback"
     KEYCLOAK_BASE_URL: str = "http://localhost:8080"
+    MCP_URL: str = "http://localhost:8081/sse"
+    OPENAI_API_KEY: str
 
 
 settings = Settings()
