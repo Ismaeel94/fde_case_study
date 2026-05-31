@@ -7,7 +7,6 @@ from gradio import mount_gradio_app
 from app.api.v1.middleware import auth_middleware
 from app.api.v1.router import api_router
 from app.core.config import settings
-from app.llm.llms import init_general_agent
 from app.services.assistant import init_assistant_service
 from app.services.mcp_client import postgres_mcp_tools
 from app.ui.gradio_app import create_ui
@@ -17,9 +16,7 @@ from app.ui.gradio_app import create_ui
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with postgres_mcp_tools() as tools:
-        general_agent = init_general_agent(tools)
-        init_assistant_service(general_agent)
-
+        init_assistant_service(tools)
         yield
 
 

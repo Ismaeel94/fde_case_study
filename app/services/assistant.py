@@ -1,10 +1,27 @@
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from functools import lru_cache
+from pathlib import Path
+
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+
 from app.core.session import SESSION_STORE
 from app.schemas.assistant import AssistantResponse
+from app.api.llms.llms import get_llm
+from app.services.skills.customer_escalation_summary import CustomerEscalationGraph
+from app.services.orchestration.master_graph import MasterGraph
+
+
+GENERAL_AGENT_SYSTEM_PROMPT_PATH = (
+    Path(__file__).resolve().parents[1] / "prompts" / "general_agent_system_prompt.txt"
+)
 
 
 class AssistantUnauthorizedError(Exception):
     """Raised when the caller has no valid session."""
+
+
+@lru_cache
+def _load_general_agent_system_prompt() -> str:
+    return GENERAL_AGENT_SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
 
 
 def _history_to_messages(history: list[dict] | None) -> list[BaseMessage]:
@@ -19,9 +36,25 @@ def _history_to_messages(history: list[dict] | None) -> list[BaseMessage]:
     return messages
 
 
+def _build_agent_messages(
+    history: list[dict] | None,
+    message: str | None,
+) -> list[BaseMessage]:
+    messages: list[BaseMessage] = [
+        SystemMessage(content=_load_general_agent_system_prompt())
+    ]
+    history_messages = _history_to_messages(history)
+    if history_messages:
+        messages.extend(history_messages)
+    elif message and message.strip():
+        messages.append(HumanMessage(content=message.strip()))
+    return messages
+
 class AssistantService:
-    def __init__(self, general_agent):
-        self.general_agent = general_agent
+    def __init__(self, llm, tools):
+        self.llm = llm
+        self.tools = tools
+        self.master_graph = MasterGraph(llm=llm, tools=tools)
 
     async def get_response(
         self,
@@ -32,19 +65,18 @@ class AssistantService:
         if not session_id or session_id not in SESSION_STORE:
             raise AssistantUnauthorizedError()
 
-        messages = _history_to_messages(history)
-        if not messages and message and message.strip():
-            messages = [HumanMessage(content=message.strip())]
+        messages = _build_agent_messages(history, message)
 
-        response = await self.general_agent.ainvoke({"messages": messages})
-        text_response = response["messages"][-1].content
+        response = await self.master_graph.run(messages)
 
-        return AssistantResponse(message=text_response)
+        print("response", response)
+
+        return AssistantResponse(message=str(response["response"]))
 
 
 assistant_service = None
 
 
-def init_assistant_service(general_agent):
+def init_assistant_service(tools):
     global assistant_service
-    assistant_service = AssistantService(general_agent=general_agent)
+    assistant_service = AssistantService(llm=get_llm(), tools=tools)
