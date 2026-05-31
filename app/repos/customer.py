@@ -1,11 +1,12 @@
 import asyncio
 
+from app.repos.db_utils import sql_string_literal
 from app.services.mcp_client import get_column, get_first_row, query_postgres
 
 
 class CustomerRepository:
     async def get_customer_by_name(self, customer_name: str) -> dict | None:
-        safe_name = self.sql_string_literal(customer_name)
+        safe_name = sql_string_literal(customer_name)
 
         sql = f"""
         SELECT id, name
@@ -89,6 +90,3 @@ class CustomerRepository:
         }
     async def query_postgres(self, sql: str) -> list[dict]:
         return await query_postgres(sql)
-
-    def sql_string_literal(self, value: str) -> str:
-        return "'" + value.replace("'", "''") + "'"

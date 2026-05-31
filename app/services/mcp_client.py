@@ -149,7 +149,6 @@ def parse_mcp_query_rows(result: CallToolResult) -> list[dict]:
 
 async def query_postgres(sql: str) -> list[dict]:
     result = await call_postgres_tool("query", {"sql": sql})
-    print("result", result)
     return parse_mcp_query_rows(result)
 
 

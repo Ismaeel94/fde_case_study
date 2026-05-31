@@ -3,7 +3,7 @@ from pathlib import Path
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
-from app.core.session import SESSION_STORE
+import app.core.session as sess
 from app.schemas.assistant import AssistantResponse
 from app.api.llms.llms import get_llm
 from app.services.skills.customer_escalation_summary import CustomerEscalationGraph
@@ -62,14 +62,17 @@ class AssistantService:
         session_id: str | None,
         history: list[dict] | None,
     ) -> AssistantResponse:
-        if not session_id or session_id not in SESSION_STORE:
+        session = await sess.session_store.get_session(session_id)
+        if not session_id or await sess.session_store.get_session(session_id) is None:
             raise AssistantUnauthorizedError()
+
+        session_user_id = session.get("user_id")
+        session_user_roles = session.get("roles")
+        print(f"session_user_roles: {session_user_roles}")
 
         messages = _build_agent_messages(history, message)
 
-        response = await self.master_graph.run(messages)
-
-        print("response", response)
+        response = await self.master_graph.run(messages, session_user_id, session_user_roles)
 
         return AssistantResponse(message=str(response["response"]))
 

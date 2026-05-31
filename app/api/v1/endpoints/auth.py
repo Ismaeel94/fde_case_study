@@ -7,8 +7,13 @@ from fastapi.responses import RedirectResponse
 from jose import JWTError, jwt
 
 from app.core.config import settings
-from app.core.session import SESSION_STORE
+import app.core.session as sess
 from app.schemas.assistant import AssistantRequest
+from fastapi import Request, Response
+from app.repos.users import get_or_create_user_from_claims
+from app.cache.user_cache import get_user_cache
+
+
 
 router = APIRouter(tags=["auth"])
 
@@ -57,19 +62,37 @@ async def auth_callback(code: str):
 
     id_claims = await verify_keycloak_jwt(id_token, access_token=access_token)
     access_claims = await verify_keycloak_jwt(access_token, verify_audience=False)
+    
+    print(f"Preferred username: {id_claims['preferred_username']}")
+    user_cache = await get_user_cache()
 
+    for user in user_cache:
+        if user["username"] == id_claims["preferred_username"]:
+            db_user = user
+            break
+    else:
+        raise HTTPException(status_code=401, detail="User not found in the database")
 
+    roles = access_claims.get("realm_access", {}).get("roles", []),
+    if isinstance(len(roles) > 0 and roles[0], list):
+        roles = roles[0]
+
+    print ("\n\naccess claims:")
+    print(access_claims)
+
+    print(f"User: {db_user}")
+    
     session = {
         "sub": id_claims["sub"],
+        "user_id": db_user["id"],
         "email": id_claims.get("email"),
         "username": id_claims.get("preferred_username"),
-        "roles": access_claims.get("realm_access", {}).get("roles", []),
+        "roles": roles,
+        "id_token": id_token,
     }
 
     session_id = str(uuid4())
-
-    SESSION_STORE[session_id] = session
-
+    await sess.session_store.create_session(session_id, session)
     
     response = RedirectResponse(f"/assistant")
     response.set_cookie(
@@ -125,3 +148,38 @@ async def verify_keycloak_jwt(
 
     except (JWTError, StopIteration):
         raise HTTPException(status_code=401, detail="Invalid token")    
+
+@router.get("/logout")
+async def logout(request: Request):
+
+    session_id = request.cookies.get("session")
+    id_token = None
+
+    if session_id:
+        session = await sess.session_store.get_session(session_id)
+
+        if session:
+            id_token = session.get("id_token")
+
+        await sess.session_store.delete_session(session_id)
+
+    if id_token:
+        logout_url = (
+            f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.REALM}"
+            f"/protocol/openid-connect/logout"
+            f"?id_token_hint={id_token}"
+            f"&post_logout_redirect_uri={settings.APP_BASE_URL}/login"
+        )
+    else:
+        logout_url = "/login"
+
+    response = RedirectResponse(url=logout_url)
+
+    response.delete_cookie(
+        key="session",
+        httponly=True,
+        secure=False,
+        samesite="lax",
+    )
+
+    return response

@@ -19,9 +19,10 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "FDE Case Study API"
     API_V1_PREFIX: str = ""
     DEBUG: bool = False
-    HOST: str = "127.0.0.1"
+    HOST: str = "localhost"
     PORT: int = 8000
-    REALM: str= "case_study"
+    APP_BASE_URL: str = "http://localhost:8000"
+    REALM: str = "case_study"
     CLIENT_ID: str = "support_assistant"
     CLIENT_SECRET:str
     KEY_CLOAK_LOGIN_URL: str = "http://localhost:8080/realms/{REALM}/protocol/openid-connect/auth?client_id={CLIENT_ID}&response_type=code&scope=openid&redirect_uri={REDIRECT_URI}"
@@ -29,6 +30,7 @@ class Settings(BaseSettings):
     KEYCLOAK_BASE_URL: str = "http://localhost:8080"
     MCP_URL: str = "http://localhost:8081/sse"
     OPENAI_API_KEY: str
-
+    REDIS_URL: str = "redis://localhost:6379/0"
+    DATABASE_URL:str ="postgresql://ey_user:ey_password@localhost:5432/ey_demo"
 
 settings = Settings()

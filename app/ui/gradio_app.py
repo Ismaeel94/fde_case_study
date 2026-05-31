@@ -58,9 +58,50 @@ async def respond(
     return updated, ""
 
 
+HEADER_CSS = """
+.acme-header {
+    align-items: center !important;
+    margin-bottom: 0.5rem !important;
+}
+.acme-header > :first-child {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+.acme-header > :last-child {
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+.acme-logout-btn {
+    width: fit-content !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+}
+.acme-logout-btn button {
+    width: fit-content !important;
+    min-width: 0 !important;
+    padding: 0.2rem 0.65rem !important;
+    font-size: 0.85rem !important;
+    line-height: 1.2 !important;
+}
+"""
+
+
 def create_ui() -> gr.Blocks:
-    with gr.Blocks(title=TITLE) as ui:
-        gr.Markdown(f"# {TITLE}")
+    with gr.Blocks(title=TITLE, css=HEADER_CSS) as ui:
+        with gr.Row(elem_classes=["acme-header"]):
+            gr.Markdown(f"# {TITLE}")
+            logout_button = gr.Button(
+                "Logout",
+                variant="secondary",
+                size="sm",
+                elem_classes=["acme-logout-btn"],
+            )
+            logout_button.click(
+                None,
+                js="() => { window.location.href = '/logout'; }",
+            )
 
         chatbot = gr.Chatbot(
             label="Chat",

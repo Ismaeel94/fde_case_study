@@ -1,9 +1,9 @@
 INSERT INTO users
 (username, email, full_name, role)
 VALUES
-('admin', 'admin@example.com', 'Admin User', 'admin_user'),
-('sales', 'sales@example.com', 'Sales User', 'sales_user'),
-('support', 'support@example.com', 'Support User', 'support_user');
+('admin_user', 'admin@example.com', 'Admin User', 'admin_user'),
+('sales_user', 'sales@example.com', 'Sales User', 'sales_user'),
+('support_user', 'support@example.com', 'Support User', 'support_user');
 
 INSERT INTO customers
 (name, support_owner_id, status, notes)
