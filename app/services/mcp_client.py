@@ -22,7 +22,8 @@ class MCPQueryError(Exception):
 
 @asynccontextmanager
 async def postgres_mcp_tools():
-    async with sse_client(settings.MCP_URL) as streams:
+    async with sse_client(
+            settings.MCP_URL) as streams:
         async with ClientSession(*streams) as session:
             await session.initialize()
             tools = await load_mcp_tools(session)
@@ -30,7 +31,9 @@ async def postgres_mcp_tools():
 
 
 async def call_postgres_tool(tool_name: str, arguments: dict) -> CallToolResult:
-    async with sse_client(settings.MCP_URL) as streams:
+    async with sse_client(
+            settings.MCP_URL
+        ) as streams:
         async with ClientSession(*streams) as session:
             await session.initialize()
             return await session.call_tool(tool_name, arguments)

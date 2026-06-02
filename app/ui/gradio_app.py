@@ -35,7 +35,7 @@ async def respond(
         return history or [], ""
 
     cleaned = message.strip()
-    updated = list(history or [])
+    updated = history or []
     updated.append({"role": "user", "content": cleaned})
 
     try:
@@ -45,8 +45,7 @@ async def respond(
 
         payload = await service.get_response(
             cleaned,
-            _session_id_from_request(request),
-            updated
+            _session_id_from_request(request)
         )
         updated.append(_assistant_message(payload.message))
     except AssistantUnauthorizedError:

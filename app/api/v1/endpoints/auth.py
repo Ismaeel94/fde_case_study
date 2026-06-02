@@ -35,7 +35,7 @@ async def auth_callback(code: str):
 
     print(f"Callback endpoint called")
     token_url = (
-        f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.REALM}/protocol/openid-connect/token"
+        f"{settings.KEYCLOAK_INTERNAL_URL}/realms/{settings.REALM}/protocol/openid-connect/token"
     )
 
     async with httpx.AsyncClient() as client:
@@ -77,11 +77,6 @@ async def auth_callback(code: str):
     if isinstance(len(roles) > 0 and roles[0], list):
         roles = roles[0]
 
-    print ("\n\naccess claims:")
-    print(access_claims)
-
-    print(f"User: {db_user}")
-    
     session = {
         "sub": id_claims["sub"],
         "user_id": db_user["id"],
@@ -114,7 +109,10 @@ async def verify_keycloak_jwt(
     verify_audience: bool = True,
 ) -> dict:
     issuer = f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.REALM}"
-    jwks_url = f"{issuer}/protocol/openid-connect/certs"
+    jwks_url = (
+        f"{settings.KEYCLOAK_INTERNAL_URL}/realms/{settings.REALM}"
+        "/protocol/openid-connect/certs"
+    )
 
     async with httpx.AsyncClient() as client:
         jwks = (await client.get(jwks_url)).json()

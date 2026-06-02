@@ -1,6 +1,7 @@
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 import app.core.session as sess
+from app.core.config import settings
 
 
 PUBLIC_PATHS = {
@@ -13,6 +14,8 @@ PUBLIC_PATHS = {
 
 async def auth_middleware(request: Request, call_next):
     path = request.url.path
+    if settings.EVALUATE_MODE:
+        return await call_next(request)
 
     if path in PUBLIC_PATHS:
         return await call_next(request)

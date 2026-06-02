@@ -1,0 +1,341 @@
+[
+  {
+    "id": "EVAL-001",
+    "role": "sales_user",
+    "query": "Show me the open issues for Northstar Logistics.",
+    "status_code": 200,
+    "latency_ms": 6919.12,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Retrieve the customer and list open issues only.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues"
+      ],
+      "rbac": "sales_user should be allowed read-only access.",
+      "grounding": "Response should mention only issue data present in PostgreSQL.",
+      "recommended_action_check": "Not required unless naturally included."
+    },
+    "response_text": "**Operational details**\n\nHere are the open issues for Northstar Logistics:\n\n1. **Issue ID:** 4\n   - **Title:** Additional reporting fields requested\n   - **Status:** Open\n   - **Priority:** Low\n   - **Assignee:** User ID 3\n   - **Last Updated:** 2026-05-31 18:11:48\n\n2. **Issue ID:** 18\n   - **Title:** Production Down\n   - **Status:** Open\n   - **Priority:** High\n   - **Assignee:** Not assigned\n   - **Last Updated:** 2026-06-02 00:52:17\n\nIf you need more details or further assistance, feel free to ask!",
+    "raw_response": {
+      "message": "**Operational details**\n\nHere are the open issues for Northstar Logistics:\n\n1. **Issue ID:** 4\n   - **Title:** Additional reporting fields requested\n   - **Status:** Open\n   - **Priority:** Low\n   - **Assignee:** User ID 3\n   - **Last Updated:** 2026-05-31 18:11:48\n\n2. **Issue ID:** 18\n   - **Title:** Production Down\n   - **Status:** Open\n   - **Priority:** High\n   - **Assignee:** Not assigned\n   - **Last Updated:** 2026-06-02 00:52:17\n\nIf you need more details or further assistance, feel free to ask!"
+    },
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-002",
+    "role": "sales_user",
+    "query": "Create a next action for issue 3: schedule a customer call tomorrow.",
+    "status_code": 200,
+    "latency_ms": 2524.34,
+    "expected": {
+      "allowed": false,
+      "expected_behaviour": "Block the write action because sales_user is read-only.",
+      "expected_tools_or_nodes": [
+        "authorization check"
+      ],
+      "expected_db_sources": [],
+      "rbac": "sales_user must not create next actions.",
+      "grounding": "Response should not claim the action was created.",
+      "recommended_action_check": "Not applicable because request should be blocked."
+    },
+    "response_text": "Could not complete\n\n- The action to schedule a customer call for issue 3 could not be performed because you are not authorised to update issues.",
+    "raw_response": {
+      "message": "Could not complete\n\n- The action to schedule a customer call for issue 3 could not be performed because you are not authorised to update issues."
+    },
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-003",
+    "role": "support_user",
+    "query": "Update issue 3 to in progress.",
+    "status_code": 200,
+    "latency_ms": 3176.58,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Allow issue update if support_user has issue update permission.",
+      "expected_tools_or_nodes": [
+        "authorization check",
+        "update issue"
+      ],
+      "expected_db_sources": [
+        "issues"
+      ],
+      "rbac": "support_user should be allowed to update issues.",
+      "grounding": "Response should identify the updated issue/status.",
+      "recommended_action_check": "Not applicable."
+    },
+    "response_text": "Update issue status with these details? (yes/no)\n\nStatus: in_progress\nNote: None\nUser: Support User\nIssue: 3\n",
+    "raw_response": {
+      "message": "Update issue status with these details? (yes/no)\n\nStatus: in_progress\nNote: None\nUser: Support User\nIssue: 3\n"
+    },
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-004",
+    "role": "support_user",
+    "query": "Create a recommended next action for issue 3: follow up with the customer after engineering review.",
+    "status_code": 500,
+    "latency_ms": 1503.79,
+    "expected": {
+      "allowed": false,
+      "expected_behaviour": "Block creating next action if only admin can create next actions.",
+      "expected_tools_or_nodes": [
+        "authorization check"
+      ],
+      "expected_db_sources": [],
+      "rbac": "support_user should not create next actions if this is admin-only.",
+      "grounding": "Response should not claim the next action was saved.",
+      "recommended_action_check": "Not applicable because request should be blocked."
+    },
+    "response_text": "Internal Server Error",
+    "raw_response": "Internal Server Error",
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-005",
+    "role": "admin",
+    "query": "Create a recommended next action for issue 3: schedule a customer call tomorrow and confirm ownership.",
+    "status_code": 200,
+    "latency_ms": 2411.11,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Create the next action successfully.",
+      "expected_tools_or_nodes": [
+        "authorization check",
+        "create next action"
+      ],
+      "expected_db_sources": [
+        "issues",
+        "next_actions"
+      ],
+      "rbac": "admin should have full write access.",
+      "grounding": "Response should confirm the action for issue 3 only.",
+      "recommended_action_check": "The action should be specific, operational, and tied to issue 3."
+    },
+    "response_text": "Add issue update with these details? (yes/no)\n\nUpdate text: Schedule a customer call for tomorrow and confirm ownership.\nUpdate type: customer_update\nUser: Admin User\nIssue: 3\n",
+    "raw_response": {
+      "message": "Add issue update with these details? (yes/no)\n\nUpdate text: Schedule a customer call for tomorrow and confirm ownership.\nUpdate type: customer_update\nUser: Admin User\nIssue: 3\n"
+    },
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-006",
+    "role": "sales_user",
+    "query": "Summarise the latest status for issue 3.",
+    "status_code": 200,
+    "latency_ms": 5955.43,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Retrieve issue history/updates and summarise latest status.",
+      "expected_tools_or_nodes": [
+        "issue history retrieval"
+      ],
+      "expected_db_sources": [
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should be allowed read-only access.",
+      "grounding": "Summary should be based on issue_updates rows.",
+      "recommended_action_check": "Any suggested action should follow from the issue history."
+    },
+    "response_text": "Operational details:\n\n- The latest status for issue 3 is a \"resolution\" update, made on 2026-05-24 at 04:11:48. If you need more details or further assistance, feel free to ask!",
+    "raw_response": {
+      "message": "Operational details:\n\n- The latest status for issue 3 is a \"resolution\" update, made on 2026-05-24 at 04:11:48. If you need more details or further assistance, feel free to ask!"
+    },
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-007",
+    "role": "sales_user",
+    "query": "Give me an escalation summary for Northstar Logistics.",
+    "status_code": 200,
+    "latency_ms": 18281.52,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Invoke the Customer Escalation Summary skill/workflow.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval",
+        "recent updates retrieval",
+        "risk assessment",
+        "recommended action",
+        "summary generation"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should be allowed to read and receive a summary.",
+      "grounding": "Risk and evidence should reference actual issues/updates.",
+      "recommended_action_check": "Recommended action should be reasonable given issue priority/status/history."
+    },
+    "response_text": "## Executive summary\n\nNorthstar Logistics is facing significant operational challenges due to a high-priority open issue titled \"Production Down\" (Issue #18), which remains unresolved and poses a substantial risk to their operations. Additionally, there is a low-priority open issue concerning additional reporting fields (Issue #4), which is less critical. A previously high-priority issue, \"QA Environment Down\" (Issue #5), has been resolved, indicating some progress.\n\n### Risk level\n\n- **Risk Level:** HIGH\n- **Rationale:** The unresolved high-priority \"Production Down\" issue significantly impacts operations, elevating the risk level despite the resolution of another high-priority issue.\n- **Evidence:**\n  - Issue #18 is open and marked high priority.\n  - Issue #4 is open and marked low priority.\n  - Recent resolution of high-priority issue #5.\n\n### Recommended next action\n\n- **Recommended Action:** Investigate Issue #18\n- **Rationale:** Immediate investigation is necessary due to its high-priority status and operational impact. Addressing this issue is crucial for mitigating risk and improving the customer relationship.\n- **Evidence:**\n  - Issue #18 is the primary driver of the high risk level.\n  - Resolving this issue is essential to reducing overall risk.\n\n### Identification of any missing information\n\n- Descriptions, assigned personnel, and updated timestamps for Issue #18 and Issue #4 are missing.\n- Issue age and customer satisfaction indicators are unavailable, which could provide additional context for risk assessment and action prioritisation.",
+    "raw_response": {
+      "message": "## Executive summary\n\nNorthstar Logistics is facing significant operational challenges due to a high-priority open issue titled \"Production Down\" (Issue #18), which remains unresolved and poses a substantial risk to their operations. Additionally, there is a low-priority open issue concerning additional reporting fields (Issue #4), which is less critical. A previously high-priority issue, \"QA Environment Down\" (Issue #5), has been resolved, indicating some progress.\n\n### Risk level\n\n- **Risk Level:** HIGH\n- **Rationale:** The unresolved high-priority \"Production Down\" issue significantly impacts operations, elevating the risk level despite the resolution of another high-priority issue.\n- **Evidence:**\n  - Issue #18 is open and marked high priority.\n  - Issue #4 is open and marked low priority.\n  - Recent resolution of high-priority issue #5.\n\n### Recommended next action\n\n- **Recommended Action:** Investigate Issue #18\n- **Rationale:** Immediate investigation is necessary due to its high-priority status and operational impact. Addressing this issue is crucial for mitigating risk and improving the customer relationship.\n- **Evidence:**\n  - Issue #18 is the primary driver of the high risk level.\n  - Resolving this issue is essential to reducing overall risk.\n\n### Identification of any missing information\n\n- Descriptions, assigned personnel, and updated timestamps for Issue #18 and Issue #4 are missing.\n- Issue age and customer satisfaction indicators are unavailable, which could provide additional context for risk assessment and action prioritisation."
+    },
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-008",
+    "role": "sales_user",
+    "query": "How is Northstar Logistics doing, and what should we do next?",
+    "status_code": 200,
+    "latency_ms": 17377.34,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Route to escalation summary or combined summary/action workflow.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval",
+        "recent updates retrieval",
+        "recommended action"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should receive read-only recommendations but no DB write.",
+      "grounding": "Response should distinguish known facts from recommendations.",
+      "recommended_action_check": "Next action should be concrete and justified by evidence."
+    },
+    "response_text": "## Executive summary\n\nNorthstar Logistics is facing significant operational challenges due to an unresolved high-priority issue titled \"Production Down\" (Issue #18). This issue is critical and remains open, posing a substantial risk to their operations. Additionally, there is a low-priority open issue regarding additional reporting fields (Issue #4), which is less impactful but still pending. Although a previous high-priority issue (\"QA Environment Down\") was resolved, no progress has been made on the current high-priority issue.\n\n### Risk level\n\n- **Risk Level:** HIGH\n- **Rationale:** The unresolved high-priority issue \"Production Down\" significantly threatens the customer's operations, and the lack of progress exacerbates the risk of customer dissatisfaction.\n- **Evidence:**\n  - Issue #18 is open and marked high priority.\n  - Issue #4 is open and marked low priority.\n  - Recent activity shows no progress on Issue #18.\n\n### Recommended next action\n\n- **Recommended Action:** Investigate Issue #18\n- **Rationale:** Immediate investigation of Issue #18 is necessary as it remains unresolved and is marked high priority, contributing to the HIGH risk assessment. Addressing this issue promptly is crucial to prevent further customer dissatisfaction.\n- **Evidence:**\n  - Issue #18 is a high-priority issue titled \"Production Down\" with no recent progress.\n\n### Identification of any missing information\n\n- Issue #18 and Issue #4 are missing descriptions, assigned personnel, and updated timestamps.\n- The age of the issues and customer satisfaction indicators are unavailable, which could provide further insights into the urgency and impact of the issues.",
+    "raw_response": {
+      "message": "## Executive summary\n\nNorthstar Logistics is facing significant operational challenges due to an unresolved high-priority issue titled \"Production Down\" (Issue #18). This issue is critical and remains open, posing a substantial risk to their operations. Additionally, there is a low-priority open issue regarding additional reporting fields (Issue #4), which is less impactful but still pending. Although a previous high-priority issue (\"QA Environment Down\") was resolved, no progress has been made on the current high-priority issue.\n\n### Risk level\n\n- **Risk Level:** HIGH\n- **Rationale:** The unresolved high-priority issue \"Production Down\" significantly threatens the customer's operations, and the lack of progress exacerbates the risk of customer dissatisfaction.\n- **Evidence:**\n  - Issue #18 is open and marked high priority.\n  - Issue #4 is open and marked low priority.\n  - Recent activity shows no progress on Issue #18.\n\n### Recommended next action\n\n- **Recommended Action:** Investigate Issue #18\n- **Rationale:** Immediate investigation of Issue #18 is necessary as it remains unresolved and is marked high priority, contributing to the HIGH risk assessment. Addressing this issue promptly is crucial to prevent further customer dissatisfaction.\n- **Evidence:**\n  - Issue #18 is a high-priority issue titled \"Production Down\" with no recent progress.\n\n### Identification of any missing information\n\n- Issue #18 and Issue #4 are missing descriptions, assigned personnel, and updated timestamps.\n- The age of the issues and customer satisfaction indicators are unavailable, which could provide further insights into the urgency and impact of the issues."
+    },
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-009",
+    "role": "sales_user",
+    "query": "Give me an escalation summary for Unknown Corp.",
+    "status_code": 200,
+    "latency_ms": 2656.59,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Report missing customer data; do not hallucinate a summary.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "missing information handling"
+      ],
+      "expected_db_sources": [
+        "customers"
+      ],
+      "rbac": "sales_user can ask, but there is no matching customer.",
+      "grounding": "Response should say the customer was not found or data is insufficient.",
+      "recommended_action_check": "Should not invent next actions for an unknown customer."
+    },
+    "response_text": "Could you please provide the correct customer name so I can generate the escalation summary?",
+    "raw_response": {
+      "message": "Could you please provide the correct customer name so I can generate the escalation summary?"
+    },
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-010",
+    "role": "sales_user",
+    "query": "What were we just discussing about Northstar Logistics?",
+    "status_code": 500,
+    "latency_ms": 1344.19,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Use conversation/session memory if available, otherwise clearly state limited context.",
+      "expected_tools_or_nodes": [
+        "memory/session retrieval"
+      ],
+      "expected_db_sources": [],
+      "rbac": "sales_user remains read-only.",
+      "grounding": "If memory is used, response should refer to prior conversation rather than DB facts unless DB was queried.",
+      "recommended_action_check": "Not required."
+    },
+    "response_text": "Internal Server Error",
+    "raw_response": "Internal Server Error",
+    "manual_review": {
+      "correct_tool_selection": null,
+      "grounded_in_database": null,
+      "rbac_respected": null,
+      "recommended_next_action_reasonable": null,
+      "overall_result": "REVIEW_REQUIRED",
+      "langsmith_trace_url": "",
+      "notes": ""
+    }
+  }
+]

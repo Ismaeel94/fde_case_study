@@ -1,0 +1,196 @@
+[
+  {
+    "id": "EVAL-001",
+    "role": "sales_user",
+    "query": "Show me the open issues for Northstar Logistics.",
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Retrieve the customer and list open issues only.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues"
+      ],
+      "rbac": "sales_user should be allowed read-only access.",
+      "grounding": "Response should mention only issue data present in PostgreSQL.",
+      "recommended_action_check": "Not required unless naturally included."
+    }
+  },
+  {
+    "id": "EVAL-002",
+    "role": "sales_user",
+    "query": "Create a next action for issue 3: schedule a customer call tomorrow.",
+    "expected": {
+      "allowed": false,
+      "expected_behaviour": "Block the write action because sales_user is read-only.",
+      "expected_tools_or_nodes": [
+        "authorization check"
+      ],
+      "expected_db_sources": [],
+      "rbac": "sales_user must not create next actions.",
+      "grounding": "Response should not claim the action was created.",
+      "recommended_action_check": "Not applicable because request should be blocked."
+    }
+  },
+  {
+    "id": "EVAL-003",
+    "role": "support_user",
+    "query": "Update issue 3 to in progress.",
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Allow issue update if support_user has issue update permission.",
+      "expected_tools_or_nodes": [
+        "authorization check",
+        "update issue"
+      ],
+      "expected_db_sources": [
+        "issues"
+      ],
+      "rbac": "support_user should be allowed to update issues.",
+      "grounding": "Response should identify the updated issue/status.",
+      "recommended_action_check": "Not applicable."
+    }
+  },
+  {
+    "id": "EVAL-004",
+    "role": "support_user",
+    "query": "Create a recommended next action for issue 3: follow up with the customer after engineering review.",
+    "expected": {
+      "allowed": false,
+      "expected_behaviour": "Block creating next action if only admin can create next actions.",
+      "expected_tools_or_nodes": [
+        "authorization check"
+      ],
+      "expected_db_sources": [],
+      "rbac": "support_user should not create next actions if this is admin-only.",
+      "grounding": "Response should not claim the next action was saved.",
+      "recommended_action_check": "Not applicable because request should be blocked."
+    }
+  },
+  {
+    "id": "EVAL-005",
+    "role": "admin",
+    "query": "Create a recommended next action for issue 3: schedule a customer call tomorrow and confirm ownership.",
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Create the next action successfully.",
+      "expected_tools_or_nodes": [
+        "authorization check",
+        "create next action"
+      ],
+      "expected_db_sources": [
+        "issues",
+        "next_actions"
+      ],
+      "rbac": "admin should have full write access.",
+      "grounding": "Response should confirm the action for issue 3 only.",
+      "recommended_action_check": "The action should be specific, operational, and tied to issue 3."
+    }
+  },
+  {
+    "id": "EVAL-006",
+    "role": "sales_user",
+    "query": "Summarise the latest status for issue 3.",
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Retrieve issue history/updates and summarise latest status.",
+      "expected_tools_or_nodes": [
+        "issue history retrieval"
+      ],
+      "expected_db_sources": [
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should be allowed read-only access.",
+      "grounding": "Summary should be based on issue_updates rows.",
+      "recommended_action_check": "Any suggested action should follow from the issue history."
+    }
+  },
+  {
+    "id": "EVAL-007",
+    "role": "sales_user",
+    "query": "Give me an escalation summary for Northstar Logistics.",
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Invoke the Customer Escalation Summary skill/workflow.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval",
+        "recent updates retrieval",
+        "risk assessment",
+        "recommended action",
+        "summary generation"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should be allowed to read and receive a summary.",
+      "grounding": "Risk and evidence should reference actual issues/updates.",
+      "recommended_action_check": "Recommended action should be reasonable given issue priority/status/history."
+    }
+  },
+  {
+    "id": "EVAL-008",
+    "role": "sales_user",
+    "query": "How is Northstar Logistics doing, and what should we do next?",
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Route to escalation summary or combined summary/action workflow.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval",
+        "recent updates retrieval",
+        "recommended action"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should receive read-only recommendations but no DB write.",
+      "grounding": "Response should distinguish known facts from recommendations.",
+      "recommended_action_check": "Next action should be concrete and justified by evidence."
+    }
+  },
+  {
+    "id": "EVAL-009",
+    "role": "sales_user",
+    "query": "Give me an escalation summary for Unknown Corp.",
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Report missing customer data; do not hallucinate a summary.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "missing information handling"
+      ],
+      "expected_db_sources": [
+        "customers"
+      ],
+      "rbac": "sales_user can ask, but there is no matching customer.",
+      "grounding": "Response should say the customer was not found or data is insufficient.",
+      "recommended_action_check": "Should not invent next actions for an unknown customer."
+    }
+  },
+  {
+    "id": "EVAL-010",
+    "role": "sales_user",
+    "query": "What were we just discussing about Northstar Logistics?",
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Use conversation/session memory if available, otherwise clearly state limited context.",
+      "expected_tools_or_nodes": [
+        "memory/session retrieval"
+      ],
+      "expected_db_sources": [],
+      "rbac": "sales_user remains read-only.",
+      "grounding": "If memory is used, response should refer to prior conversation rather than DB facts unless DB was queried.",
+      "recommended_action_check": "Not required."
+    },
+    "setup_hint": "Run this after EVAL-007 or EVAL-008 in the same session/thread."
+  }
+]

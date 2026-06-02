@@ -1,6 +1,4 @@
 # Environment and secrets
-.env
-.env.*
 !.env.example
 
 # Python
@@ -58,6 +56,10 @@ Desktop.ini
 # Logs and local runtime
 *.log
 logs/
+
+# Eval artifacts (keep folder via .gitkeep)
+app/eval/node_traces/*
+!app/eval/node_traces/.gitkeep
 
 # uvicorn / local dev
 *.pid

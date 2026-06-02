@@ -1,5 +1,5 @@
 from typing import Literal
-
+import langsmith
 from app.db.postgres import get_pool
 from app.repos.db_utils import sql_string_literal
 
@@ -14,7 +14,7 @@ IssueUpdateType = Literal[
     "resolution",
 ]
 
-
+@langsmith.traceable(run_type="tool")
 async def update_issue_status(
     issue_id: int,
     status: IssueStatus,
@@ -82,7 +82,7 @@ async def update_issue_status(
         "issue": dict(updated),
     }
 
-
+@langsmith.traceable(run_type="tool")
 async def add_issue_update(
     issue_id: int,
     update_text: str,
@@ -139,7 +139,7 @@ async def add_issue_update(
         "issue_update": dict(inserted),
     }
 
-
+@langsmith.traceable(run_type="tool")
 async def create_issue(
     customer_id: int,
     title: str,

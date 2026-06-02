@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI
 import gradio as gr
@@ -14,6 +15,37 @@ from app.ui.gradio_app import create_ui
 from app.db.postgres import close_db_pool, init_db_pool
 from app.cache.customer_cache import refresh_customer_cache
 from app.cache.user_cache import refresh_user_cache
+from app.services.orchestration.master_graph import init_checkpointer
+from langgraph.checkpoint.redis.aio import AsyncRedisSaver
+from redis.exceptions import ResponseError
+import traceback
+
+
+def configure_logging() -> None:
+    """Emit INFO/DEBUG only from our code; keep third-party libraries at WARNING+."""
+    app_level = logging.DEBUG if settings.DEBUG else logging.INFO
+
+    logging.basicConfig(
+        level=logging.WARNING,
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        force=True,
+    )
+
+    logging.getLogger("app").setLevel(app_level)
+
+    for name in (
+        "asyncio",
+        "httpx",
+        "httpcore",
+        "urllib3",
+        "langsmith",
+        "openai",
+        "uvicorn.access",
+    ):
+        logging.getLogger(name).setLevel(logging.WARNING)
+
+
+configure_logging()
 
 
 @asynccontextmanager
@@ -24,21 +56,18 @@ async def lifespan(app: FastAPI):
         await refresh_customer_cache()
         await refresh_user_cache()
 
-        async with postgres_mcp_tools() as   tools:
-            init_assistant_service(tools)
-            yield
+        async with AsyncRedisSaver.from_conn_string(settings.REDIS_URL) as checkpointer:
+            await checkpointer.asetup()
+            await init_checkpointer(checkpointer)
+
+            async with postgres_mcp_tools() as tools:
+                init_assistant_service(tools)
+                yield        
 
     finally:
         await close_session_store()
         await close_db_pool()
 
-
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     await list_postgres_tools()
-#     await init_general_agent()
-#     init_assistant_service()
-#     yield
 
 def create_app() -> FastAPI:
     application = FastAPI(title=settings.PROJECT_NAME, debug=settings.DEBUG, lifespan=lifespan)
