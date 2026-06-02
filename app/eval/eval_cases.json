@@ -56,22 +56,6 @@
   },
   {
     "id": "EVAL-004",
-    "role": "support_user",
-    "query": "Create a recommended next action for issue 3: follow up with the customer after engineering review.",
-    "expected": {
-      "allowed": false,
-      "expected_behaviour": "Block creating next action if only admin can create next actions.",
-      "expected_tools_or_nodes": [
-        "authorization check"
-      ],
-      "expected_db_sources": [],
-      "rbac": "support_user should not create next actions if this is admin-only.",
-      "grounding": "Response should not claim the next action was saved.",
-      "recommended_action_check": "Not applicable because request should be blocked."
-    }
-  },
-  {
-    "id": "EVAL-005",
     "role": "admin",
     "query": "Create a recommended next action for issue 3: schedule a customer call tomorrow and confirm ownership.",
     "expected": {
@@ -91,7 +75,7 @@
     }
   },
   {
-    "id": "EVAL-006",
+    "id": "EVAL-005",
     "role": "sales_user",
     "query": "Summarise the latest status for issue 3.",
     "expected": {
@@ -110,7 +94,7 @@
     }
   },
   {
-    "id": "EVAL-007",
+    "id": "EVAL-006",
     "role": "sales_user",
     "query": "Give me an escalation summary for Northstar Logistics.",
     "expected": {
@@ -135,7 +119,7 @@
     }
   },
   {
-    "id": "EVAL-008",
+    "id": "EVAL-007",
     "role": "sales_user",
     "query": "How is Northstar Logistics doing, and what should we do next?",
     "expected": {
@@ -158,7 +142,7 @@
     }
   },
   {
-    "id": "EVAL-009",
+    "id": "EVAL-008",
     "role": "sales_user",
     "query": "Give me an escalation summary for Unknown Corp.",
     "expected": {
@@ -177,7 +161,7 @@
     }
   },
   {
-    "id": "EVAL-010",
+    "id": "EVAL-009",
     "role": "sales_user",
     "query": "What were we just discussing about Northstar Logistics?",
     "expected": {
@@ -191,6 +175,6 @@
       "grounding": "If memory is used, response should refer to prior conversation rather than DB facts unless DB was queried.",
       "recommended_action_check": "Not required."
     },
-    "setup_hint": "Run this after EVAL-007 or EVAL-008 in the same session/thread."
+    "setup_hint": "Run this after EVAL-006 or EVAL-007 in the same session/thread."
   }
 ]

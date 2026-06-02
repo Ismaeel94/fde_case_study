@@ -96,6 +96,7 @@ def create_ui() -> gr.Blocks:
                 variant="secondary",
                 size="sm",
                 elem_classes=["acme-logout-btn"],
+                scale=0
             )
             logout_button.click(
                 None,

@@ -259,8 +259,11 @@ class MasterGraph:
     @staticmethod
     def route_tasks(state: MasterGraphState):
         sends = []
+        tasks = state["tasks"]["tasks"]
+        if tasks is None or len(tasks) == 0:
+            tasks =  [{"intent": "none", "query": "No tasks to perform"}]
 
-        for task in state["tasks"]["tasks"]:
+        for task in tasks:
             intent = task["intent"]
             if intent == "customer_escalation_summary":
                 sends.append(Send("run_customer_escalation_summary", state))

@@ -1,0 +1,314 @@
+[
+  {
+    "id": "EVAL-001",
+    "role": "sales_user",
+    "query": "Show me the open issues for Northstar Logistics.",
+    "status_code": 200,
+    "latency_ms": 6792.63,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Retrieve the customer and list open issues only.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues"
+      ],
+      "rbac": "sales_user should be allowed read-only access.",
+      "grounding": "Response should mention only issue data present in PostgreSQL.",
+      "recommended_action_check": "Not required unless naturally included."
+    },
+    "response_text": "### Operational details\n\nHere is the open issue for Northstar Logistics:\n\n- **Issue ID**: 4\n- **Title**: Additional reporting fields requested\n- **Status**: Open\n- **Priority**: Low\n- **Assignee**: User ID 3\n- **Last Updated**: June 1, 2026\n\nIf you need more details or further assistance, feel free to ask!",
+    "raw_response": {
+      "message": "### Operational details\n\nHere is the open issue for Northstar Logistics:\n\n- **Issue ID**: 4\n- **Title**: Additional reporting fields requested\n- **Status**: Open\n- **Priority**: Low\n- **Assignee**: User ID 3\n- **Last Updated**: June 1, 2026\n\nIf you need more details or further assistance, feel free to ask!"
+    },
+    "manual_review": {
+      "correct_tool_selection": "agent chose mcp tool to query postgressql",
+      "grounded_in_database": "Results reflect records from the database",
+      "rbac_respected": "Yes",
+      "recommended_next_action_reasonable": "NA",
+      "overall_result": "PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/dc4ca49f-6b91-4a68-a316-a66c613262c1/r",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-002",
+    "role": "sales_user",
+    "query": "Create a next action for issue 3: schedule a customer call tomorrow.",
+    "status_code": 200,
+    "latency_ms": 2643.68,
+    "expected": {
+      "allowed": false,
+      "expected_behaviour": "Block the write action because sales_user is read-only.",
+      "expected_tools_or_nodes": [
+        "authorization check"
+      ],
+      "expected_db_sources": [],
+      "rbac": "sales_user must not create next actions.",
+      "grounding": "Response should not claim the action was created.",
+      "recommended_action_check": "Not applicable because request should be blocked."
+    },
+    "response_text": "I'm sorry, but you are not authorised to update issues. The action to schedule a customer call for issue 3 was not performed.",
+    "raw_response": {
+      "message": "I'm sorry, but you are not authorised to update issues. The action to schedule a customer call for issue 3 was not performed."
+    },
+    "manual_review": {
+      "correct_tool_selection": "NA",
+      "grounded_in_database": "NA",
+      "rbac_respected": "Yes. Sales_user is not allowed to make any changes to the database. This is controlled through realm roles from KeyCloak",
+      "recommended_next_action_reasonable": "NA",
+      "overall_result": "PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/714a3b99-ea56-4a7f-8c09-17fca5c7f493/r",
+      "notes": "The langgraph correctly discerned user intent and check authorization before proceeding."
+    }
+  },
+  {
+    "id": "EVAL-003",
+    "role": "support_user",
+    "query": "Update issue 3 to in progress.",
+    "status_code": 200,
+    "latency_ms": 2406.98,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Allow issue update for support_user.",
+      "expected_tools_or_nodes": [
+        "authorization check",
+        "update issue"
+      ],
+      "expected_db_sources": [
+        "issues"
+      ],
+      "rbac": "support_user should be allowed to update issues.",
+      "grounding": "Response should identify the updated issue/status.",
+      "recommended_action_check": "Not applicable."
+    },
+    "response_text": "Update issue status with these details? (yes/no)\n\nStatus: in_progress\nNote: None\nUser: Support User\nIssue: 3\n",
+    "raw_response": {
+      "message": "Update issue status with these details? (yes/no)\n\nStatus: in_progress\nNote: None\nUser: Support User\nIssue: 3\n"
+    },
+    "manual_review": {
+      "correct_tool_selection": "NA",
+      "grounded_in_database": "NA",
+      "rbac_respected": "Yes. Support User is allowed to make updates to issues, but not create issues",
+      "recommended_next_action_reasonable": "NA",
+      "overall_result": "PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/f6386179-53e3-461e-86c5-125a5581cbc9/r",
+      "notes": "The langgraph correctly discerned user intent and check authorization before proceeding. Then asked for human approval for proposed changes before making them in the database (HITL)"
+    }
+  },
+  {
+    "id": "EVAL-004",
+    "role": "admin",
+    "query": "Create a recommended next action for issue 3: schedule a customer call tomorrow and confirm ownership.",
+    "status_code": 200,
+    "latency_ms": 2264.51,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Create the next action successfully.",
+      "expected_tools_or_nodes": [
+        "authorization check",
+        "create next action"
+      ],
+      "expected_db_sources": [
+        "issues",
+        "next_actions"
+      ],
+      "rbac": "admin should have full write access.",
+      "grounding": "Response should confirm the action for issue 3 only.",
+      "recommended_action_check": "The action should be specific, operational, and tied to issue 3."
+    },
+    "response_text": "Add issue update with these details? (yes/no)\n\nUpdate text: Schedule a customer call for tomorrow and confirm ownership.\nUpdate type: customer_update\nUser: Admin User\nIssue: 3\n",
+    "raw_response": {
+      "message": "Add issue update with these details? (yes/no)\n\nUpdate text: Schedule a customer call for tomorrow and confirm ownership.\nUpdate type: customer_update\nUser: Admin User\nIssue: 3\n"
+    },
+    "manual_review": {
+      "correct_tool_selection": "NA",
+      "grounded_in_database": "Yes. The system correctly extracted information from caches, which are supplied by the postgres DB",
+      "rbac_respected": "Yes. Only the admin user is allowed to create issues in the DB",
+      "recommended_next_action_reasonable": "NA",
+      "overall_result": "PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/83c13713-05c9-45ee-9b4d-879ebc1bbc23/r",
+      "notes": "The langgraph correctly discerned user intent and check authorization before proceeding. Then asked for human approval for proposed changes before making them in the database (HITL)"
+    }
+  },
+  {
+    "id": "EVAL-005",
+    "role": "sales_user",
+    "query": "Summarise the latest status for issue 3.",
+    "status_code": 200,
+    "latency_ms": 5434.7,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Retrieve issue history/updates and summarise latest status.",
+      "expected_tools_or_nodes": [
+        "issue history retrieval"
+      ],
+      "expected_db_sources": [
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should be allowed read-only access.",
+      "grounding": "Summary should be based on issue_updates rows.",
+      "recommended_action_check": "Any suggested action should follow from the issue history."
+    },
+    "response_text": "**Operational details**\n\nThe latest status update for issue 3 is a \"resolution\" update, which was made on May 25, 2026. If you need more details or further assistance, feel free to ask!",
+    "raw_response": {
+      "message": "**Operational details**\n\nThe latest status update for issue 3 is a \"resolution\" update, which was made on May 25, 2026. If you need more details or further assistance, feel free to ask!"
+    },
+    "manual_review": {
+      "correct_tool_selection": "agent chose mcp tool to query postgressql",
+      "grounded_in_database": "Results reflect records from the database",,
+      "rbac_respected": "Yes. Sales user is allowed to query data",
+      "recommended_next_action_reasonable": "NA",
+      "overall_result": "PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/7248d328-5b93-462d-853a-37a7f2a76e25/r",
+      "notes": ""
+    }
+  },
+  {
+    "id": "EVAL-006",
+    "role": "sales_user",
+    "query": "Give me an escalation summary for Northstar Logistics.",
+    "status_code": 200,
+    "latency_ms": 13289.89,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Invoke the Customer Escalation Summary skill/workflow.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval",
+        "recent updates retrieval",
+        "risk assessment",
+        "recommended action",
+        "summary generation"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should be allowed to read and receive a summary.",
+      "grounding": "Risk and evidence should reference actual issues/updates.",
+      "recommended_action_check": "Recommended action should be reasonable given issue priority/status/history."
+    },
+    "response_text": "**Executive summary**\n\nNorthstar Logistics currently has one open issue regarding a request for additional reporting fields, which is marked as low priority. The customer is awaiting clarification on the required report fields, indicating no immediate dissatisfaction or urgency.\n\n- **Risk Level:** LOW\n  - **Rationale:** The risk is low due to only one open issue with low priority. The customer is awaiting clarification, showing no immediate concerns.\n  - **Evidence:** \n    - Issue #4 is open and marked low priority.\n    - Recent customer activity shows they are awaiting clarification on issue #4.\n\n**Recommended next action**\n\n- **Action:** Provide a customer update to clarify the required report fields for Issue #4.\n  - **Rationale:** Clarifying the required report fields will help progress the issue and maintain customer satisfaction.\n  - **Evidence:** \n    - Issue #4 is open and marked low priority.\n    - Recent customer activity indicates they are awaiting clarification.\n\n**Identification of any missing information**\n\nThe following information is missing for Issue #4: description, assigned_to, and updated_at. This missing information could impact the efficiency of resolving the issue.",
+    "raw_response": {
+      "message": "**Executive summary**\n\nNorthstar Logistics currently has one open issue regarding a request for additional reporting fields, which is marked as low priority. The customer is awaiting clarification on the required report fields, indicating no immediate dissatisfaction or urgency.\n\n- **Risk Level:** LOW\n  - **Rationale:** The risk is low due to only one open issue with low priority. The customer is awaiting clarification, showing no immediate concerns.\n  - **Evidence:** \n    - Issue #4 is open and marked low priority.\n    - Recent customer activity shows they are awaiting clarification on issue #4.\n\n**Recommended next action**\n\n- **Action:** Provide a customer update to clarify the required report fields for Issue #4.\n  - **Rationale:** Clarifying the required report fields will help progress the issue and maintain customer satisfaction.\n  - **Evidence:** \n    - Issue #4 is open and marked low priority.\n    - Recent customer activity indicates they are awaiting clarification.\n\n**Identification of any missing information**\n\nThe following information is missing for Issue #4: description, assigned_to, and updated_at. This missing information could impact the efficiency of resolving the issue."
+    },
+    "manual_review": {
+      "correct_tool_selection": "Correct skill chosen for escalation summary. Database tools used fetch open issues and recent activity. Since tool choice is static for this workflow, the tools were called programmatically instead of by an agent.",
+      "grounded_in_database": "yes",
+      "rbac_respected": "Yes",
+      "recommended_next_action_reasonable": "Reasonable next action recommended",
+      "overall_result": "PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/d6e6ebc7-9414-4a10-8262-f98cb5d6dc63/r",
+      "notes": "Escalation summary with all required sections provided"
+    }
+  },
+  {
+    "id": "EVAL-007",
+    "role": "sales_user",
+    "query": "How is Northstar Logistics doing, and what should we do next?",
+    "status_code": 200,
+    "latency_ms": 12576.74,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Route to escalation summary or combined summary/action workflow.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "open issues retrieval",
+        "recent updates retrieval",
+        "recommended action"
+      ],
+      "expected_db_sources": [
+        "customers",
+        "issues",
+        "issue_updates"
+      ],
+      "rbac": "sales_user should receive read-only recommendations but no DB write.",
+      "grounding": "Response should distinguish known facts from recommendations.",
+      "recommended_action_check": "Next action should be concrete and justified by evidence."
+    },
+    "response_text": "## Executive summary\n\nNorthstar Logistics currently has one open issue, which involves a request for additional reporting fields. This issue is marked as low priority and is awaiting clarification from the customer regarding the specific report fields needed. The customer is engaged and awaiting further information, indicating no immediate dissatisfaction.\n\n### Risk level\n\n- **Risk Level:** LOW\n- **Rationale:** The risk is low due to only one open issue with low priority. The customer's engagement in seeking clarification suggests no immediate dissatisfaction or urgency.\n- **Evidence:**\n  - Issue #4 is open and marked low priority.\n  - Recent customer activity shows they are awaiting clarification on issue #4.\n\n### Recommended next action\n\n- **Recommended Action:** Provide clarification to the customer regarding the required report fields for Issue #4.\n- **Rationale:** Clarifying the report fields will address the customer's request and maintain satisfaction. The issue is low priority, and the customer is actively engaged, indicating that resolving this will help progress the issue.\n- **Evidence:**\n  - The issue is open and marked low priority.\n  - Customer activity indicates they are awaiting clarification.\n\n### Identification of any missing information\n\n- Issue #4 is missing a description.\n- Issue #4 lacks an assigned person.\n- The last update timestamp for Issue #4 is missing.",
+    "raw_response": {
+      "message": "## Executive summary\n\nNorthstar Logistics currently has one open issue, which involves a request for additional reporting fields. This issue is marked as low priority and is awaiting clarification from the customer regarding the specific report fields needed. The customer is engaged and awaiting further information, indicating no immediate dissatisfaction.\n\n### Risk level\n\n- **Risk Level:** LOW\n- **Rationale:** The risk is low due to only one open issue with low priority. The customer's engagement in seeking clarification suggests no immediate dissatisfaction or urgency.\n- **Evidence:**\n  - Issue #4 is open and marked low priority.\n  - Recent customer activity shows they are awaiting clarification on issue #4.\n\n### Recommended next action\n\n- **Recommended Action:** Provide clarification to the customer regarding the required report fields for Issue #4.\n- **Rationale:** Clarifying the report fields will address the customer's request and maintain satisfaction. The issue is low priority, and the customer is actively engaged, indicating that resolving this will help progress the issue.\n- **Evidence:**\n  - The issue is open and marked low priority.\n  - Customer activity indicates they are awaiting clarification.\n\n### Identification of any missing information\n\n- Issue #4 is missing a description.\n- Issue #4 lacks an assigned person.\n- The last update timestamp for Issue #4 is missing."
+    },
+    "manual_review": {
+      "correct_tool_selection": "Correct skill chosen for escalation summary. Database tools used fetch open issues and recent activity. Since tool choice is static for this workflow, the tools were called programmatically instead of by an agent.",
+      "grounded_in_database": "Yes",
+      "rbac_respected": "Yes",
+      "recommended_next_action_reasonable": "Reasonable next action recommended.",
+      "overall_result": "PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/3d4bf71f-90bc-4e5d-8901-b1ec6aa75cca/r",
+      "notes": "Escalation summary with all required sections provided"
+    }
+  },
+  {
+    "id": "EVAL-008",
+    "role": "sales_user",
+    "query": "Give me an escalation summary for Unknown Corp.",
+    "status_code": 200,
+    "latency_ms": 9174.63,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Report missing customer data; do not hallucinate a summary.",
+      "expected_tools_or_nodes": [
+        "customer lookup",
+        "missing information handling"
+      ],
+      "expected_db_sources": [
+        "customers"
+      ],
+      "rbac": "sales_user can ask, but there is no matching customer.",
+      "grounding": "Response should say the customer was not found or data is insufficient.",
+      "recommended_action_check": "Should not invent next actions for an unknown customer."
+    },
+    "response_text": "Could you please provide the correct customer name so I can generate the escalation summary?",
+    "raw_response": {
+      "message": "Could you please provide the correct customer name so I can generate the escalation summary?"
+    },
+    "manual_review": {
+      "correct_tool_selection": "Customer Resolution agent successfully triggered",
+      "grounded_in_database": "Confirmed existing customers from cache (based on DB)",
+      "rbac_respected": "Yes",
+      "recommended_next_action_reasonable": "NA",
+      "overall_result": "PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/cc45ab8a-d775-4323-a65b-66b36bb7a109/r",
+      "notes": "Clarification of user name requested from user."
+    }
+  },
+  {
+    "id": "EVAL-009",
+    "role": "sales_user",
+    "query": "What were we just discussing about Northstar Logistics?",
+    "status_code": 200,
+    "latency_ms": 26092.84,
+    "expected": {
+      "allowed": true,
+      "expected_behaviour": "Use conversation/session memory if available, otherwise clearly state limited context.",
+      "expected_tools_or_nodes": [
+        "memory/session retrieval"
+      ],
+      "expected_db_sources": [],
+      "rbac": "sales_user remains read-only.",
+      "grounding": "If memory is used, response should refer to prior conversation rather than DB facts unless DB was queried.",
+      "recommended_action_check": "Not required."
+    },
+    "response_text": "## Executive summary\n\nNorthstar Logistics currently has one open issue titled \"Additional reporting fields requested,\" which is marked as low priority. The issue is awaiting clarification from the customer regarding the required report fields. Recent activity shows that the customer is engaged and has provided updates, indicating a willingness to resolve the issue.\n\n### Risk level\n\n- **Risk Level:** LOW\n- **Rationale:** The risk is assessed as low due to the presence of only one open issue, which is low priority. The issue is open and awaiting customer clarification, suggesting no significant blockers or dissatisfaction.\n- **Evidence:**\n  - Issue #4 is open and marked low priority.\n  - Recent customer activity indicates awaiting clarification on issue #4.\n\n### Recommended next action\n\n- **Recommended Action:** Follow up with the customer to obtain clarification on the required report fields for Issue #4.\n- **Rationale:** Following up will help resolve the issue, which is currently low priority and awaiting customer input. This action will aid in progressing the issue without escalating risk.\n- **Evidence:**\n  - The issue is open and marked as low priority.\n  - Recent activity indicates the issue is awaiting customer clarification.\n\n### Identification of any missing information\n\n- Issue #4 is missing a description.\n- Issue #4 is missing an assigned person.\n- Issue #4 is missing an updated timestamp.",
+    "raw_response": {
+      "message": "## Executive summary\n\nNorthstar Logistics currently has one open issue titled \"Additional reporting fields requested,\" which is marked as low priority. The issue is awaiting clarification from the customer regarding the required report fields. Recent activity shows that the customer is engaged and has provided updates, indicating a willingness to resolve the issue.\n\n### Risk level\n\n- **Risk Level:** LOW\n- **Rationale:** The risk is assessed as low due to the presence of only one open issue, which is low priority. The issue is open and awaiting customer clarification, suggesting no significant blockers or dissatisfaction.\n- **Evidence:**\n  - Issue #4 is open and marked low priority.\n  - Recent customer activity indicates awaiting clarification on issue #4.\n\n### Recommended next action\n\n- **Recommended Action:** Follow up with the customer to obtain clarification on the required report fields for Issue #4.\n- **Rationale:** Following up will help resolve the issue, which is currently low priority and awaiting customer input. This action will aid in progressing the issue without escalating risk.\n- **Evidence:**\n  - The issue is open and marked as low priority.\n  - Recent activity indicates the issue is awaiting customer clarification.\n\n### Identification of any missing information\n\n- Issue #4 is missing a description.\n- Issue #4 is missing an assigned person.\n- Issue #4 is missing an updated timestamp."
+    },
+    "manual_review": {
+      "correct_tool_selection": "Memory was used to fetch previous context",
+      "grounded_in_database": "NA",
+      "rbac_respected": "Yes",
+      "recommended_next_action_reasonable": "NA",
+      "overall_result": "PARTIAL PASS",
+      "langsmith_trace_url": "https://smith.langchain.com/public/f7e91bff-7f21-436a-a83a-1c2ce1ff87a8/r",
+      "notes": "Ideally the agent should have answered the question directly and briefly instead of triggering the flow of the prevous message."
+    }
+  }
+]
