@@ -41,6 +41,36 @@ INSERT INTO issues
 VALUES
 (
     1,
+    'Delayed API responses during peak hours',
+    'Customer reports significant latency during morning business hours.',
+    'open',
+    'high',
+    3,
+    NOW() - INTERVAL '5 days',
+    NOW() - INTERVAL '4 hours'
+),
+(
+    1,
+    'Incorrect renewal pricing shown in dashboard',
+    'Dashboard is displaying outdated renewal pricing.',
+    'in_progress',
+    'medium',
+    3,
+    NOW() - INTERVAL '3 days',
+    NOW() - INTERVAL '1 day'
+),
+(
+    1,
+    'SSO login failures',
+    'Users experienced login failures after identity provider certificate changes.',
+    'resolved',
+    'high',
+    3,
+    NOW() - INTERVAL '12 days',
+    NOW() - INTERVAL '8 days'
+),
+(
+    1,
     'Intermittent webhook delivery failures',
     'Customer reports that some outbound webhooks are not being delivered reliably.',
     'open',
@@ -58,6 +88,16 @@ VALUES
     3,
     NOW() - INTERVAL '2 days',
     NOW() - INTERVAL '12 hours'
+),
+(
+    2,
+    'Additional reporting fields requested',
+    'Customer requested extra shipment reporting attributes.',
+    'open',
+    'low',
+    3,
+    NOW() - INTERVAL '2 days',
+    NOW() - INTERVAL '10 hours'
 ),
 (
     2,
@@ -83,12 +123,23 @@ VALUES
 INSERT INTO issue_updates
 (issue_id, updated_by, update_type, update_text, created_at)
 VALUES
-(5, 3, 'triage', 'Initial triage completed. Delivery failures appear intermittent.', NOW() - INTERVAL '3 days'),
-(5, 3, 'investigation', 'Webhook retry logs show failures for a subset of endpoints.', NOW() - INTERVAL '1 day'),
-(5, 3, 'technical_note', 'Engineering is reviewing timeout handling in the webhook worker.', NOW() - INTERVAL '6 hours'),
+(1, 3, 'triage', 'Initial triage completed. Latency spikes confirmed.', NOW() - INTERVAL '4 days'),
+(1, 3, 'investigation', 'Database CPU usage increases significantly during reporting windows.', NOW() - INTERVAL '2 days'),
+(1, 3, 'technical_note', 'Potential missing indexes identified on reporting queries.', NOW() - INTERVAL '4 hours'),
 
-(6, 3, 'customer_update', 'Customer provided examples of missing audit log records.', NOW() - INTERVAL '1 day'),
-(6, 3, 'investigation', 'Audit events are being generated but not consistently persisted.', NOW() - INTERVAL '12 hours'),
+(2, 3, 'customer_update', 'Customer confirmed the issue affects several enterprise accounts.', NOW() - INTERVAL '2 days'),
+(2, 3, 'investigation', 'Pricing synchronisation job appears to be using stale configuration.', NOW() - INTERVAL '1 day'),
+
+(3, 3, 'resolution', 'Updated identity provider configuration and validated successful login.', NOW() - INTERVAL '8 days'),
+
+(4, 3, 'triage', 'Initial triage completed. Delivery failures appear intermittent.', NOW() - INTERVAL '3 days'),
+(4, 3, 'investigation', 'Webhook retry logs show failures for a subset of endpoints.', NOW() - INTERVAL '1 day'),
+(4, 3, 'technical_note', 'Engineering is reviewing timeout handling in the webhook worker.', NOW() - INTERVAL '6 hours'),
+
+(5, 3, 'customer_update', 'Customer provided examples of missing audit log records.', NOW() - INTERVAL '1 day'),
+(5, 3, 'investigation', 'Audit events are being generated but not consistently persisted.', NOW() - INTERVAL '12 hours'),
+
+(6, 3, 'customer_update', 'Awaiting clarification regarding required report fields.', NOW() - INTERVAL '10 hours'),
 
 (7, 3, 'triage', 'Initial triage completed. Delays confirmed for shipment status ingestion.', NOW() - INTERVAL '5 days'),
 (7, 3, 'investigation', 'Queue backlog observed during high-volume shipment updates.', NOW() - INTERVAL '2 days'),
@@ -103,5 +154,17 @@ INSERT INTO next_actions
 VALUES
 (1, 3, 'pending', 'Review query execution plans and confirm indexing recommendations.', CURRENT_DATE + 1),
 (1, 2, 'pending', 'Provide customer-facing progress update.', CURRENT_DATE + 1),
+
 (2, 3, 'in_progress', 'Validate pricing synchronisation configuration.', CURRENT_DATE + 2),
-(4, 3, 'pending', 'Collect detailed reporting requirements from customer.', CURRENT_DATE + 3);
+
+(4, 3, 'pending', 'Review webhook retry logic and identify failure patterns.', CURRENT_DATE + 2),
+(4, 2, 'pending', 'Provide customer with investigation update.', CURRENT_DATE + 1),
+
+(5, 3, 'pending', 'Investigate audit event persistence failures.', CURRENT_DATE + 3),
+
+(6, 3, 'pending', 'Collect detailed reporting requirements from customer.', CURRENT_DATE + 3),
+
+(7, 3, 'pending', 'Analyse ingestion queue bottlenecks and propose remediation.', CURRENT_DATE + 2),
+
+(8, 3, 'in_progress', 'Evaluate streaming export implementation for large datasets.', CURRENT_DATE + 4);
+
