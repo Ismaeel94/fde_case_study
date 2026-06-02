@@ -41,58 +41,62 @@ INSERT INTO issues
 VALUES
 (
     1,
-    'Delayed API responses during peak hours',
-    'Customer reports significant latency during morning business hours.',
+    'Intermittent webhook delivery failures',
+    'Customer reports that some outbound webhooks are not being delivered reliably.',
     'open',
     'high',
     3,
-    NOW() - INTERVAL '5 days',
-    NOW() - INTERVAL '4 hours'
+    NOW() - INTERVAL '4 days',
+    NOW() - INTERVAL '6 hours'
 ),
 (
     1,
-    'Incorrect renewal pricing shown in dashboard',
-    'Dashboard is displaying outdated renewal pricing.',
-    'in_progress',
+    'Missing audit log entries for admin actions',
+    'Customer reports that some administrator changes are not appearing in the audit log.',
+    'open',
     'medium',
     3,
-    NOW() - INTERVAL '3 days',
-    NOW() - INTERVAL '1 day'
-),
-(
-    1,
-    'SSO login failures',
-    'Users experienced login failures after identity provider certificate changes.',
-    'resolved',
-    'high',
-    3,
-    NOW() - INTERVAL '12 days',
-    NOW() - INTERVAL '8 days'
+    NOW() - INTERVAL '2 days',
+    NOW() - INTERVAL '12 hours'
 ),
 (
     2,
-    'Additional reporting fields requested',
-    'Customer requested extra shipment reporting attributes.',
+    'Shipment status updates delayed',
+    'Customer reports delays in shipment status updates appearing in the platform.',
     'open',
-    'low',
+    'medium',
     3,
-    NOW() - INTERVAL '2 days',
-    NOW() - INTERVAL '10 hours'
+    NOW() - INTERVAL '6 days',
+    NOW() - INTERVAL '1 day'
+),
+(
+    2,
+    'Bulk export fails for large shipment reports',
+    'Customer reports that exporting large shipment reports sometimes fails before completion.',
+    'in_progress',
+    'high',
+    3,
+    NOW() - INTERVAL '5 days',
+    NOW() - INTERVAL '8 hours'
 );
 
 INSERT INTO issue_updates
 (issue_id, updated_by, update_type, update_text, created_at)
 VALUES
-(1, 3, 'triage', 'Initial triage completed. Latency spikes confirmed.', NOW() - INTERVAL '4 days'),
-(1, 3, 'investigation', 'Database CPU usage increases significantly during reporting windows.', NOW() - INTERVAL '2 days'),
-(1, 3, 'technical_note', 'Potential missing indexes identified on reporting queries.', NOW() - INTERVAL '4 hours'),
+(5, 3, 'triage', 'Initial triage completed. Delivery failures appear intermittent.', NOW() - INTERVAL '3 days'),
+(5, 3, 'investigation', 'Webhook retry logs show failures for a subset of endpoints.', NOW() - INTERVAL '1 day'),
+(5, 3, 'technical_note', 'Engineering is reviewing timeout handling in the webhook worker.', NOW() - INTERVAL '6 hours'),
 
-(2, 3, 'customer_update', 'Customer confirmed the issue affects several enterprise accounts.', NOW() - INTERVAL '2 days'),
-(2, 3, 'investigation', 'Pricing synchronisation job appears to be using stale configuration.', NOW() - INTERVAL '1 day'),
+(6, 3, 'customer_update', 'Customer provided examples of missing audit log records.', NOW() - INTERVAL '1 day'),
+(6, 3, 'investigation', 'Audit events are being generated but not consistently persisted.', NOW() - INTERVAL '12 hours'),
 
-(3, 3, 'resolution', 'Updated identity provider configuration and validated successful login.', NOW() - INTERVAL '8 days'),
+(7, 3, 'triage', 'Initial triage completed. Delays confirmed for shipment status ingestion.', NOW() - INTERVAL '5 days'),
+(7, 3, 'investigation', 'Queue backlog observed during high-volume shipment updates.', NOW() - INTERVAL '2 days'),
+(7, 3, 'customer_update', 'Customer informed that investigation is ongoing.', NOW() - INTERVAL '1 day'),
 
-(4, 3, 'customer_update', 'Awaiting clarification regarding required report fields.', NOW() - INTERVAL '10 hours');
+(8, 3, 'triage', 'Initial triage completed. Failures reproduced with large export payloads.', NOW() - INTERVAL '4 days'),
+(8, 3, 'investigation', 'Export worker memory usage increases sharply for large reports.', NOW() - INTERVAL '2 days'),
+(8, 3, 'technical_note', 'Pagination and streaming export options are being reviewed.', NOW() - INTERVAL '8 hours');
 
 INSERT INTO next_actions
 (issue_id, owner_id, status, action_text, due_date)
